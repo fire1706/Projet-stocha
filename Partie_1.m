@@ -31,6 +31,8 @@ w_1 = 2*U*b1/B;
 w_2 = 2*U*b2/B;
 C_omega = a0 + a1*(1i*omega)/(1i*omega + w_1) + a2*(1i*omega)/(1i*omega + w_2);
 q = pi*rho*U^2*B;
+Grosse_matrice_desesmorts = [B*omega^2/(4*U^2) - C_omega*1i*omega/U , B/(4*U)*1i*omega + C_omega*(1+B/(4*U)*1i*omega) ; -B/4*C_omega*1i*omega/U , B/4*(B^2*omega^2/(32*U^2) - B/(4*U)*1i*omega +  C_omega*(1+B/(4*U)*1i*omega))];
 F_se_omega = q*[B*omega^2/(4*U^2) - C_omega*1i*omega/U , B/(4*U)*1i*omega + C_omega*(1+B/(4*U)*1i*omega) ; -B/4*C_omega*1i*omega/U , B/4*(B^2*omega^2/(32*U^2) - B/(4*U)*1i*omega +  C_omega*(1+B/(4*U)*1i*omega))]*[POINT_interro1;POINT_interro2]; 
 F_b_omega = 1/4*rho*U*B*[4*pi;pi*B]*W_omega;
 
+H = 1/(-omega^2*M + 1i*omega*C + K - q*Grosse_matrice_desesmorts);
