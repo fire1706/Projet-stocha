@@ -42,21 +42,43 @@ while i <= length(w)
     H_t2(i) = H(2,2,i);
     H_t1(i) = H(2,1,i);
     H_z2(i) = H(1,2,i);
-% F_se_omega = q*Grosse_matrice_desesmorts*[POINT_interro1;POINT_interro2]; 
+%F_se_omega = q*Grosse_matrice_desesmorts*[POINT_interro1;POINT_interro2]; 
 % F_b_omega = 1/4*rho*U*B*[4*pi;pi*B]*W_omega;
 % H = X/fb;
 
 %B) Calcul densité de puissance 
     S_w(i) = S_omega(w(i),U);
+    F_b_omega = (1/4)*rho*U*B*[4*pi;pi*B];
+    S_b(:,:,i) = F_b_omega*S_w(i)*conj(transpose(F_b_omega));
+    S_x(:,:,i) = H(:,:,i)*S_b(:,:,i)*conj(transpose(H(:,:,i)));
+    S_zz(i) = S_x(1,1,i);
+    S_tt(i) = S_x(2,2,i);
+    S_tz(i) = S_x(2,1,i);
+    S_zt(i) = S_x(1,2,i);
     i = i + 1;
 end
 % H_zz = sqrt(H_z1.^2+H_z2.^2);
 % H_tt = sqrt(H_t1.^2+H_t2.^2);
-figure(1);
+figure;
 plot(w,abs(H_z1),'LineWidth',1.5);
-%C)
+title( 'Nodal FRF H_{zz}(\omega)' ) 
+xlabel('Pulsations \omega [rad/s]')
+ylabel('FRF')
+figure;
+plot(w,abs(H_t2),'LineWidth',1.5);
+title( 'Nodal FRF H_{\theta\theta}(\omega)' ) 
+xlabel('Pulsations \omega [rad/s]')
+ylabel('FRF')
+figure;
+semilogy(w,abs(S_tt),'LineWidth',1.5);
+ 
+%C) Vérification Theodorsen
+figure;
+hold on
+plot(w,imag(C_w),'LineWidth',1.5);
+plot(w,real(C_w),'LineWidth',1.5);
+hold off
+
+%Temporelle)
 M_conj = [pi*rho*B^2/4,0;0,pi*rho*B^4/128];
 C_conj = [0,-q*B/(4*U);0,q*B^2/(16*U)];
-
-
-
