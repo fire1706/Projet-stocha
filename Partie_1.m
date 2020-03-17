@@ -3,7 +3,7 @@
 %DONNEES:
 %1) Propriétés PONT
 i = 1;
-w = 0:0.1:2;
+w = 0:0.01:2;
 m = 22740;
 J = 2.47*10^6;
 B = 31;
@@ -36,9 +36,12 @@ H = zeros(2,2);
 while i <= length(w)    
     C_w(i) = C_omega(w(i),U,B);
     q = pi*rho*U^2*B;
-    Grosse_matrice_desesmorts = [B*w(i)^2/(4*U^2) - C_w*1i*w(i)/U , B/(4*U)*1i*w(i) + C_w*(1+B/(4*U)*1i*w(i)) ; -B/4*C_w*1i*w(i)/U , B/4*(B^2*w(i)^2/(32*U^2) - B/(4*U)*1i*w(i) +  C_w*(1+B/(4*U)*1i*w(i)))];
-    H(i,j) = (-w(i)^2*M + 1i*w(i)*C + K - q*Grosse_matrice_desesmorts).^(-1);
-    j = j + 1;
+    Grosse_matrice_desesmorts = [B*w(i)^2/(4*U^2) - C_w(i)*1i*w(i)/U , B/(4*U)*1i*w(i) + C_w(i)*(1+B/(4*U)*1i*w(i)) ; -B/4*C_w(i)*1i*w(i)/U , B/4*(B^2*w(i)^2/(32*U^2) - B/(4*U)*1i*w(i) +  C_w(i)*(1+B/(4*U)*1i*w(i)))];
+    H(:,:,i) = (-w(i)^2*M + 1i*w(i)*C + K - q*Grosse_matrice_desesmorts).^(-1);
+    H_z1(i) = H(1,1,i);
+    H_t2(i) = H(2,2,i);
+    H_t1(i) = H(2,1,i);
+    H_z2(i) = H(1,2,i);
 % F_se_omega = q*Grosse_matrice_desesmorts*[POINT_interro1;POINT_interro2]; 
 % F_b_omega = 1/4*rho*U*B*[4*pi;pi*B]*W_omega;
 % H = X/fb;
@@ -47,6 +50,10 @@ while i <= length(w)
     S_w(i) = S_omega(w(i),U);
     i = i + 1;
 end
+% H_zz = sqrt(H_z1.^2+H_z2.^2);
+% H_tt = sqrt(H_t1.^2+H_t2.^2);
+figure(1);
+plot(w,abs(H_z1),'LineWidth',1.5);
 %C)
 M_conj = [pi*rho*B^2/4,0;0,pi*rho*B^4/128];
 C_conj = [0,-q*B/(4*U);0,q*B^2/(16*U)];
