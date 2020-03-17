@@ -1,15 +1,13 @@
-function S = S_omega(w)
+function sigma_w = S_omega(w)
 U = 0:1:100;
 L_w = 20;
 I_w = 0.05;
-sigma = U*I_w;
+i = 0;
+S = zeros;
+while i <= 100
+    sigma_w = U(i)*I_w;
+    S(i) = sigma_w^2*L_w/(pi*U(i)) *(1+755.2*(w*L_w/(2*pi*U(i)))^2)/(1+283.2*(w*L_w/(2*pi*U(i)))^2)^(11/6);
+end
+end
 
-for i=1:1:101
-    jean(i) = (w*L_w)/(2*pi*U(i));
-    A(i) = sigma(i)*sigma(i)*L_w/pi/U(i);
-    B(i) = 1+ 755.2*jean*jean;
-    C(i) = 1+283.2*jean*jean;
-    S(i) = A*B/C^(11/6);
-end
-end
 
