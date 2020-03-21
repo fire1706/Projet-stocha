@@ -52,7 +52,7 @@ while j <= length(U)
         %B) Calcul densité de puissance
         S_w(i) = S_omega(w(i),U(j));
         F_b_omega = (1/4)*rho*U(j)*B*[4*pi;pi*B];
-        S_b(:,:,i) = F_b_omega*S_w(i)*(transpose(F_b_omega));
+        S_b(:,:,i) = F_b_omega*S_w(i)*conj(transpose(F_b_omega));
         S_x(:,:,i) = H(:,:,i)*S_b(:,:,i)*conj(transpose(H(:,:,i)));
         S_zz(i) = S_x(1,1,i);
         S_tt(i) = S_x(2,2,i);
