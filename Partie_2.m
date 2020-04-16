@@ -1,34 +1,53 @@
 %% Partie 2 => Analyse temporelle du problème
 clear all;
 %% DONNEES
-%Propriétés du PONT:
-k = 1;
+%Propriétés structurelles du PONT:
+%Masse par unité de longueur [kg/m]
 m = 22740;
+%Moment d’inertie par unité de longueur [kg.m^2/m]
 J = 2.47*10^6;
+%Largeur du tablier [m]
 B = 31;
+%Amortissement structurel [-]
 xhi = 0.003;
+%Fréquence propre verticale [Hz]
 f_z = 0.10;
+%Fréquence propre de torsion [Hz]
 f_theta = 0.278;
 
-%Propriétés du VENT:
+%Propriétés du VENT incident:
+%Masse volumique de l’air [kg/m^3]
 rho = 1.22;
+%Échelle de turbulence [m]
 L_w = 20;
-U = 10:1:76; % Vecteur utile => U = 10:1:76;  ATTENTION => Si vous générez une boucle de U, faites attention aux nombreuses figures qui seront plottées!!! 
+%Vitesse moyenne horizontale du vent [m/s]
+U = 10;%10:1:76; % Vecteur utile => U = 10:1:76;  ATTENTION => Si vous générez une boucle de U, faites attention aux nombreuses figures qui seront plottées!!! 
+%Intensité de turbulence [-]
 I_w = 0.05;
 
 %Valeurs utiles trouvées à la Partie 1:
+%Pulsation propre du tablier de pont [rad/s]
 w_0 = [2*pi*f_z,2*pi*f_z;2*pi*f_theta,2*pi*f_theta];
+%Matrice de masse
 M = [m,0;0,J];
+%Matrice de raideur
 K = w_0.^2.*M;
+%Matrice d'amortissement
 C = 2*xhi*sqrt(K*M);% Egalement valable: C = 2*xhi*w_0.*M;
 
 %Définition des variables pour cette partie:
+%Temps maximal désiré [sec]
 t_max = 600;
-N = t_max; % Nombre d'échantillons % Début : N = 2^(12) ???
-time = linspace(0,t_max,N); % Vecteur temps
+%Nombre d'échantillons
+N = 600; % Début: N = 2^(12) 
+%Vecteur temps [sec]
+time = linspace(0,t_max,N);
 
-d_omega = 2*pi/t_max; 
+%Pas fréquentiel [rad/s]
+d_omega = 2*pi/t_max;
+%Pulsation maximale désirée [rad/s]
 omega_max = (N-1)*d_omega;
+%Pulsation [rad/s]
 omega = (0:N-1)*d_omega;
 
 %% Résolution
@@ -56,11 +75,14 @@ w = ifft(W,'symmetric');
 % title('Processus aléatoire w(t)');
 
 %B) Implémentation d’un schéma d’intégration pour résoudre l’équation du mouvement et calcul de la réponse par ODE45:
-F_b_omega = 1/4*rho*U(j)*B*[4*pi;pi*B]*w;
-L_b = F_b_omega(1,:);
-M_b = F_b_omega(2,:);
+F_b_omega = 1/4*rho*U(j)*B*[4*pi*W.', pi*B*W.']; % Force de turbulence en fréquentiel
+f_b_omega2 = ifft(F_b_omega,'symmetric'); % Devrait être égal à f_b_omega car opérations linéaires => OK!
+f_b_omega = 1/4*rho*U(j)*B*[4*pi*w.', pi*B*w.'];% Force de turbulence en temporel
+f_b_omega = transpose(f_b_omega); %On transpose f_b_omega pour pouvoir extraire L_b et M_b comme étant des vecteurs lignes
+L_b = f_b_omega(1,:);
+M_b = f_b_omega(2,:);
 sigma_w = std(w); % Ecart-type de w(t)
-sigma_Sw = sqrt( trapz(omega,Mat_S)*2); % Ecart_type de la PSD en fréquentiel
+sigma_Sw = sqrt(trapz(omega,Mat_S)*2); % Ecart_type de la PSD en fréquentiel
 
 b0 = 0;
 b1 = 0.0455;
@@ -102,19 +124,19 @@ end
 % figure;
 % plot(omega,abs(H_zz),'LineWidth',1.5); % H_zz
 % xlim([0 2]);
-% title( 'Nodal FRF H_{zz}(\omega)' )
-% xlabel('Pulsations \omega [rad/s]')
+% title('Fonction de réponse fréquentielle H_{zz}(\omega)')
+% xlabel('Pulsation \omega [rad/s]')
 % ylabel('FRF')
 % figure;
 % plot(omega,abs(H_tt),'LineWidth',1.5); % H_thetatheta
 % xlim([0 2]);
-% title( 'Nodal FRF H_{\theta\theta}(\omega)' )
-% xlabel('Pulsations \omega [rad/s]')
+% title('Fonction de réponse fréquentielle H_{\theta\theta}(\omega)')
+% xlabel('Pulsation \omega [rad/s]')
 % ylabel('FRF')
 
-tspan = [0 t_max];
+tspan = time;
 z0 = zeros(10,1); % structure initialement immobile
-[t,z] = ode45(@(t,z) differentielle(t,z,A_final,M_final,f_b) ,tspan,z0); %ODE45 résout notre équation différentielle " M*z_dot = A*z + f_b"
+[t,z] = ode45(@(t,z) differentielle(t,z,A_final,M_final,f_b,time) ,tspan,z0); %ODE45 résout notre équation différentielle " M*z_dot = A*z + f_b"
 % figure;
 % plot(t,z(:,1),t,z(:,2),'LineWidth',1.5); % Graphe de la réponse z(t) et theta(t) de l'équation du mouvement
 % xlabel('Temps [sec]');
@@ -137,20 +159,20 @@ PSD_tt = PSD_t/(4*pi);
 % xlim([0 2]);
 % xlabel('Pulsation \omega [rad/s]');
 % ylabel('PSD');
-% title(' S_{zz}(\omega)');
+% title('Densité spectrale de puissance S_{zz}(\omega)');
 % figure;
 % semilogy(F_tt,PSD_tt,'LineWidth',1.5);
 % xlim([0 2]);
 % xlabel('Pulsation \omega [rad/s]');
 % ylabel('PSD');
-% title(' S_{\theta\theta}(\omega)');
+% title('Densité spectrale de puissance S_{\theta\theta}(\omega)');
 
 % figure;
 % semilogy(F_zz,PSD_zz,omega,Mat_S,'LineWidth',1.5); % Comparaison entre l'approche temporelle et l'approche fréquentielle
 % xlim([0 2]);
 % xlabel('Pulsation \omega [rad/s]');
 % ylabel('PSD');
-% title(' S_w(\omega)');
+% title('Densité spectrale de puissance S_w(\omega)');
 % legend('Approche temporelle','Approche fréquentielle')
 
 sigma_z(j) = std(z(:,1)); % Ecart-type de z(t)
@@ -167,7 +189,7 @@ sigma_z(68:length(U)) = 0; % Etant donné que le système devient instable passé l
 sigma_theta(68:length(U)) = 0;
 figure;
 plot(U,sigma_z,'-o',U,sigma_theta*B/2,'-o','LineWidth',1.5);
-xlabel('Vitesse moyenne du vent U [m/s]');
+xlabel('Vitesse moyenne horizontale U [m/s]');
 ylabel('Ecart-type');
 title('Ecart-type de la réponse');
 legend('\sigma_{zz}','\sigma_{\theta\theta} * B/2')
