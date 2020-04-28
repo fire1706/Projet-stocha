@@ -1,6 +1,6 @@
 %% Partie 2 => Analyse temporelle du problème
 
-function [] = Stocha_part_2()
+function [VALEURS_PROPRES] = Stocha_part_2()
 
 TITRES = {'Temps maximal t_max étudié en [sec]: ','Nombre échantillons N générés [-]: ','Vitesse(s) moyenne(s) horizontale(s) de vent étudiée(s) U en [m/s]: ','Vitesse(s) U à afficher dans [1 100]: (Si rien à afficher, [0])'};
 dlgtitle = 'Inputs';

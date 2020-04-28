@@ -57,8 +57,8 @@ C = 2*xhi*sqrt(K*M); % Egalement valable: C = 2*xhi*w_0.*M;
 C_w =zeros(length(U),length(omega_1));
 H = zeros(2,2,length(omega_1));
 H_zz = zeros(length(U),length(omega_1)); H_tt = zeros(length(U),length(omega_1));
-S_zz = zeros(length(U),length(omega_1)); S_tt = zeros(length(U),length(omega_1)); S_w = zeros(length(U),length(omega_1));
-sigma_zz = zeros; sigma_tt = zeros; sigma_w = zeros;
+S_zz = zeros(length(U),length(omega_1)); S_tt = zeros(length(U),length(omega_1));
+sigma_zz = zeros(length(U),length(omega_1)); sigma_tt = zeros(length(U),length(omega_1)); sigma_w = zer
 j = 1;
 while j <= length(U)
     

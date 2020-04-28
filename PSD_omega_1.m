@@ -1,4 +1,4 @@
-function [S_zz,S_tt] = PSD_omega_1(omega_1,U,B,rho,H,L_w,I_w)
+function [S_zz,S_tt,S_w] = PSD_omega_1(omega_1,U,B,rho,H,L_w,I_w)
 
 S_w = S_omega(omega_1,U,L_w,I_w); % Calcul de la PSD de Von Karman
 F_b_omega = (1/4)*rho*U*B*[4*pi;pi*B];

@@ -49,7 +49,7 @@ d_omega = 2*pi/t_max;
 omega_max = (N-1)*d_omega;
 %Pulsation [rad/s]
 omega = (0:N-1)*d_omega;
-omega(1) = 1e-03;
+
 %% Résolution
 
 %A)Génération de réalisations du processus w:
@@ -123,27 +123,27 @@ var = var + 1;
 end
 
 
-% figure;
-% plot(omega,abs(H_zz),'LineWidth',1.5); % H_zz
-% xlim([0 2]);
-% title('Fonction de réponse fréquentielle H_{zz}(\omega)')
-% xlabel('Pulsation \omega [rad/s]')
-% ylabel('FRF')
-% figure;
-% plot(omega,abs(H_tt),'LineWidth',1.5); % H_thetatheta
-% xlim([0 2]);
-% title('Fonction de réponse fréquentielle H_{\theta\theta}(\omega)')
-% xlabel('Pulsation \omega [rad/s]')
-% ylabel('FRF')
-% 
+figure;
+plot(omega,abs(H_zz),'LineWidth',1.5); % H_zz
+xlim([0 2]);
+title('Fonction de réponse fréquentielle H_{zz}(\omega)')
+xlabel('Pulsation \omega [rad/s]')
+ylabel('FRF')
+figure;
+plot(omega,abs(H_tt),'LineWidth',1.5); % H_thetatheta
+xlim([0 2]);
+title('Fonction de réponse fréquentielle H_{\theta\theta}(\omega)')
+xlabel('Pulsation \omega [rad/s]')
+ylabel('FRF')
+
 tspan = time;
 z0 = zeros(10,1); % structure initialement immobile
 [t,z] = ode45(@(t,z) differentielle(t,z,A_final,M_final,f_b,time) ,tspan,z0); %ODE45 résout notre équation différentielle " M*z_dot = A*z + f_b"
-% figure;
-% plot(t,z(:,1),t,z(:,2),'LineWidth',1.5); % Graphe de la réponse z(t) et theta(t) de l'équation du mouvement
-% xlabel('Temps [sec]');
-% title("Réponse de l'équation du mouvement par ODE45");
-% legend('z(t)','\theta(t)');
+figure;
+plot(t,z(:,1),t,z(:,2),'LineWidth',1.5); % Graphe de la réponse z(t) et theta(t) de l'équation du mouvement
+xlabel('Temps [sec]');
+title("Réponse de l'équation du mouvement par ODE45");
+legend('z(t)','\theta(t)');
 
 %C) Calcul de la variance de la réponse:
 dt = time(2)-time(1);
@@ -156,18 +156,18 @@ PSD_zz = PSD_z/(4*pi);
 F_tt = 2*pi*F_t; % Transformations de temporel vers fréquentiel pour la comparaison dans le domaine fréquentiel
 PSD_tt = PSD_t/(4*pi);
 
-% figure;
-% semilogy(F_zz,PSD_zz,'LineWidth',1.5);
-% xlim([0 2]);
-% xlabel('Pulsation \omega [rad/s]');
-% ylabel('PSD');
-% title('Densité spectrale de puissance S_{zz}(\omega)');
-% figure;
-% semilogy(F_tt,PSD_tt,'LineWidth',1.5);
-% xlim([0 2]);
-% xlabel('Pulsation \omega [rad/s]');
-% ylabel('PSD');
-% title('Densité spectrale de puissance S_{\theta\theta}(\omega)');
+figure;
+semilogy(F_zz,PSD_zz,'LineWidth',1.5);
+xlim([0 2]);
+xlabel('Pulsation \omega [rad/s]');
+ylabel('PSD');
+title('Densité spectrale de puissance S_{zz}(\omega)');
+figure;
+semilogy(F_tt,PSD_tt,'LineWidth',1.5);
+xlim([0 2]);
+xlabel('Pulsation \omega [rad/s]');
+ylabel('PSD');
+title('Densité spectrale de puissance S_{\theta\theta}(\omega)');
 
 % figure;
 % semilogy(F_zz,PSD_zz,omega,Mat_S,'LineWidth',1.5); % Comparaison entre l'approche temporelle et l'approche fréquentielle
