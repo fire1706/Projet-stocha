@@ -21,7 +21,7 @@ rho = 1.22;
 %Échelle de turbulence [m]
 L_w = 20;
 %Vitesse moyenne horizontale du vent [m/s]
-U = 10:1:70; % Vecteur utile => U = 10:1:76;  ATTENTION => Si vous générez une boucle de U, faites attention aux nombreuses figures qui seront plottées!!! 
+U = 10:1:50; % Vecteur utile => U = 10:1:76;  ATTENTION => Si vous générez une boucle de U, faites attention aux nombreuses figures qui seront plottées!!! 
 %Intensité de turbulence [-]
 I_w = 0.05;
 
@@ -107,12 +107,8 @@ M_final = [M_0,zeros(4,6);-Mat_A,eye(6)];
 A_final = [A_0,S_matrice;zeros(6,4),Mat_B];
 VALEURS_PROPRES(:,j) = eig(M_final\A_final); % Pour la vérification que les parties réelles des valeurs propres soient négatives
 
-
-p = 1;
-while p <= length(time)
-f_b(:,p) = [0;0;L_b(p);M_b(p);0;0;0;0;0;0]; % Forces de turbulence en temporelle 
-p = p + 1;
-end
+f_b = zeros(10,length(omega));
+f_b([3 4],:) = [L_b;M_b]; % Forces de turbulence en temporelle 
 
 var = 1; % On démarre à var = 2 pour éviter de calculer la fct de transfert quand omega = 0 (sinon on a une matrice remplie de valeurs infinies) 
 while var <= length(omega)

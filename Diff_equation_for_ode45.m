@@ -1,4 +1,4 @@
-function [t,Zout,VALEURS_PROPRES,A_final,M_final] = Diff_equation_for_ode45(time,U,B,rho,W,w,M,K,C)
+function [t,Zout,VALEURS_PROPRES,A_final,M_final] = Diff_equation_for_ode45(omega_2,time,U,B,rho,W,w,M,K,C)
 
 % F_b_omega = 1/4*rho*U*B*[4*pi*W.', pi*B*W.']; % Force de turbulence en fréquentiel
 % f_b_omega2 = ifft(F_b_omega,'symmetric'); % Devrait être égal à f_b_omega car opérations linéaires => OK!
@@ -8,17 +8,17 @@ L_b = f_b_omega(1,:);
 M_b = f_b_omega(2,:);
 
 b0 = 0;
-% b1 = 0.0455;
-% b2 = 0.3;
-b1 = 0;
-b2 = 0;
+b1 = 0.0455;
+b2 = 0.3;
+% b1 = 0;
+% b2 = 0;
 Mat_B = -2*U/B *diag([b0 b1 b2 b0 b1 b2]);
 
 a0 = 1;
-% a1 = -0.165;
-% a2 = -0.335;
-a1 = 0;
-a2 = 0;
+a1 = -0.165;
+a2 = -0.335;
+% a1 = 0;
+% a2 = 0;
 Mat_A =[0,a0,0,0;0,a1,0,0;0,a2,0,0;0,0,-a0/U,a0*B/(4*U);0,0,-a1/U,a1*B/(4*U);0,0,-a2/U,a2*B/(4*U)];
 
 q = pi*rho*U^2*B;
@@ -34,12 +34,8 @@ M_final = [M_0,zeros(4,6);-Mat_A,eye(6)];
 A_final = [A_0,S_matrice;zeros(6,4),Mat_B];
 VALEURS_PROPRES = real(eig(M_final\A_final)); % Pour la vérification que les parties réelles des valeurs propres soient négatives
 
-
-k = 1;
-while k <= length(time)
-f_b(:,k) = [0;0;L_b(k);M_b(k);0;0;0;0;0;0]; % Forces de turbulence en temporelle 
-k = k + 1;
-end
+f_b = zeros(10,length(omega_2));
+f_b([3 4],:) = [L_b;M_b]; % Forces de turbulence en temporelle 
 
 tspan = time;
 z0 = zeros(10,1); % structure initialement immobile

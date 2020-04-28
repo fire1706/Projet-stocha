@@ -6,6 +6,7 @@ dz = zeros(10,1);
 
 dt = time(2)-time(1);
 i     = floor(t/dt); % ici on repère la position de t dans le vecteur time
+
 if t == time(end)
     fb_t = f_b(:,end);
 else
