@@ -1,5 +1,5 @@
 %% Partie 1 => Analyse fréquentielle du problème
-clear all;
+%clear all;
 %% DONNEES
 %Propriétés structurelles du PONT:
 %Masse par unité de longueur [kg/m]
@@ -28,8 +28,6 @@ U = 10:1:100; % U = [0,100]: ATTENTION => Si vous générez une boucle de U, faite
 %Intensité de turbulence [-]
 I_w = 0.05;
 
-
-MAX_sigma_tt = 0; % Variable pour la détermination de U_critique (point D)
 %% Résolution
 
 %A) Fct de transfert:
@@ -125,14 +123,14 @@ while i <= length(U)-1
     i = i + 1;
 end
 
-figure;
-grid;
-hold on;
-plot(U,abs(sigma_zz),'-o','LineWidth',1.5);  % Graphe de l'écart-type sigma_zz
-plot(U,abs(sigma_tt*B/2),'-o','LineWidth',1.5); % Graphe de l'écart-type sigma_thetatheta
-xline(U_crit,'r','LineWidth',1.5);
-title('Ecart-type de la réponse');
-xlabel('Vitesse moyenne horizontale U [m/s]');
-ylabel('Ecart-type');
-legend('\sigma_{zz}','\sigma_{\theta\theta} * B/2','U_{critique}')
-hold off;
+% figure;
+% grid;
+% hold on;
+% plot(U,abs(sigma_zz),'-o','LineWidth',1.5);  % Graphe de l'écart-type sigma_zz
+% plot(U,abs(sigma_tt*B/2),'-o','LineWidth',1.5); % Graphe de l'écart-type sigma_thetatheta
+% xline(U_crit,'r','LineWidth',1.5);
+% title('Ecart-type de la réponse');
+% xlabel('Vitesse moyenne horizontale U [m/s]');
+% ylabel('Ecart-type');
+% legend('\sigma_{zz}','\sigma_{\theta\theta} * B/2','U_{critique}')
+% hold off;

@@ -21,7 +21,7 @@ rho = 1.22;
 %Échelle de turbulence [m]
 L_w = 20;
 %Vitesse moyenne horizontale du vent [m/s]
-U = 10;%10:1:76; % Vecteur utile => U = 10:1:76;  ATTENTION => Si vous générez une boucle de U, faites attention aux nombreuses figures qui seront plottées!!! 
+U = 70; % Vecteur utile => U = 10:1:76;  ATTENTION => Si vous générez une boucle de U, faites attention aux nombreuses figures qui seront plottées!!! 
 %Intensité de turbulence [-]
 I_w = 0.05;
 
@@ -68,11 +68,11 @@ W(1) = 0; % Conditions (pour vérifier la symétrie) pour la décomposition en séri
 W(N/2 + 1) = 0;
 W(N/2 + 2 : N)  = conj(W(N/2:-1:2));
 w = ifft(W,'symmetric');
-% figure;
-% plot(time,w,'LineWidth',1.2);
-% xlabel('Temps [sec]');
-% ylabel('Composante fluctuante du vent w');
-% title('Processus aléatoire w(t)');
+figure;
+plot(time,w,'LineWidth',1.2);
+xlabel('Temps [sec]');
+ylabel('Composante fluctuante du vent w [m/s]');
+title('Processus aléatoire w(t)');
 
 %B) Implémentation d’un schéma d’intégration pour résoudre l’équation du mouvement et calcul de la réponse par ODE45:
 F_b_omega = 1/4*rho*U(j)*B*[4*pi*W.', pi*B*W.']; % Force de turbulence en fréquentiel
@@ -105,6 +105,8 @@ A_0 = [zeros(2,2),eye(2);-K,-(C+C_conj)];
 
 M_final = [M_0,zeros(4,6);-Mat_A,eye(6)];
 A_final = [A_0,S_matrice;zeros(6,4),Mat_B];
+VALEURS_PROPRES(:,j) = eig(M_final\A_final); % Pour la vérification que les parties réelles des valeurs propres soient négatives
+
 
 p = 1;
 while p <= length(time)
@@ -112,36 +114,36 @@ f_b(:,p) = [0;0;L_b(p);M_b(p);0;0;0;0;0;0]; % Forces de turbulence en temporelle
 p = p + 1;
 end
 
-% var = 2; % On démarre à var = 2 pour éviter de calculer la fct de transfert quand omega = 0 (sinon on a une matrice remplie de valeurs infinies) 
-% while var <= length(omega)
-% H(:,:,var-1) = inv(1i*omega(var)*M_final - A_final); % FCT de transfert
-% H_zz(var-1) = H(1,1,var-1);
-% H_tt(var-1) = H(2,2,var-1);
-% var = var + 1;
-% end
-% valeurs_propres = real(eig(A_final)); % Pour la vérification que les parties réelles des valeurs propres soient négatives
+var = 1; % On démarre à var = 2 pour éviter de calculer la fct de transfert quand omega = 0 (sinon on a une matrice remplie de valeurs infinies) 
+while var <= length(omega)
+H(:,:,var) = inv(1i*omega(var)*M_final - A_final); % FCT de transfert
+H_zz(var) = H(1,1,var);
+H_tt(var) = H(2,2,var);
+var = var + 1;
+end
 
-% figure;
-% plot(omega,abs(H_zz),'LineWidth',1.5); % H_zz
-% xlim([0 2]);
-% title('Fonction de réponse fréquentielle H_{zz}(\omega)')
-% xlabel('Pulsation \omega [rad/s]')
-% ylabel('FRF')
-% figure;
-% plot(omega,abs(H_tt),'LineWidth',1.5); % H_thetatheta
-% xlim([0 2]);
-% title('Fonction de réponse fréquentielle H_{\theta\theta}(\omega)')
-% xlabel('Pulsation \omega [rad/s]')
-% ylabel('FRF')
+
+figure;
+plot(omega,abs(H_zz),'LineWidth',1.5); % H_zz
+xlim([0 2]);
+title('Fonction de réponse fréquentielle H_{zz}(\omega)')
+xlabel('Pulsation \omega [rad/s]')
+ylabel('FRF')
+figure;
+plot(omega,abs(H_tt),'LineWidth',1.5); % H_thetatheta
+xlim([0 2]);
+title('Fonction de réponse fréquentielle H_{\theta\theta}(\omega)')
+xlabel('Pulsation \omega [rad/s]')
+ylabel('FRF')
 
 tspan = time;
 z0 = zeros(10,1); % structure initialement immobile
 [t,z] = ode45(@(t,z) differentielle(t,z,A_final,M_final,f_b,time) ,tspan,z0); %ODE45 résout notre équation différentielle " M*z_dot = A*z + f_b"
-% figure;
-% plot(t,z(:,1),t,z(:,2),'LineWidth',1.5); % Graphe de la réponse z(t) et theta(t) de l'équation du mouvement
-% xlabel('Temps [sec]');
-% title("Réponse de l'équation du mouvement par ODE45");
-% legend('z(t)','\theta(t)');
+figure;
+plot(t,z(:,1),t,z(:,2),'LineWidth',1.5); % Graphe de la réponse z(t) et theta(t) de l'équation du mouvement
+xlabel('Temps [sec]');
+title("Réponse de l'équation du mouvement par ODE45");
+legend('z(t)','\theta(t)');
 
 %C) Calcul de la variance de la réponse:
 dt = time(2)-time(1);
@@ -154,18 +156,18 @@ PSD_zz = PSD_z/(4*pi);
 F_tt = 2*pi*F_t; % Transformations de temporel vers fréquentiel pour la comparaison dans le domaine fréquentiel
 PSD_tt = PSD_t/(4*pi);
 
-% figure;
-% semilogy(F_zz,PSD_zz,'LineWidth',1.5);
-% xlim([0 2]);
-% xlabel('Pulsation \omega [rad/s]');
-% ylabel('PSD');
-% title('Densité spectrale de puissance S_{zz}(\omega)');
-% figure;
-% semilogy(F_tt,PSD_tt,'LineWidth',1.5);
-% xlim([0 2]);
-% xlabel('Pulsation \omega [rad/s]');
-% ylabel('PSD');
-% title('Densité spectrale de puissance S_{\theta\theta}(\omega)');
+figure;
+semilogy(F_zz,PSD_zz,'LineWidth',1.5);
+xlim([0 2]);
+xlabel('Pulsation \omega [rad/s]');
+ylabel('PSD');
+title('Densité spectrale de puissance S_{zz}(\omega)');
+figure;
+semilogy(F_tt,PSD_tt,'LineWidth',1.5);
+xlim([0 2]);
+xlabel('Pulsation \omega [rad/s]');
+ylabel('PSD');
+title('Densité spectrale de puissance S_{\theta\theta}(\omega)');
 
 % figure;
 % semilogy(F_zz,PSD_zz,omega,Mat_S,'LineWidth',1.5); % Comparaison entre l'approche temporelle et l'approche fréquentielle
@@ -183,10 +185,10 @@ end
 
 %D) Calcul de la vitesse de vent critique au flottement:
 
-U = 10:1:100;
-%U_crit = 76.86; % Valeur calculée dans la partie 1
-sigma_z(68:length(U)) = 0; % Etant donné que le système devient instable passé la vitesse critique moyenne du vent U_crit, on va définir à zéro les valeurs d'écart-type pour U > U_crit
-sigma_theta(68:length(U)) = 0;
+% U = 10:1:100;
+% %U_crit = 76.86; % Valeur calculée dans la partie 1
+% sigma_z(68:length(U)) = 0; % Etant donné que le système devient instable passé la vitesse critique moyenne du vent U_crit, on va définir à zéro les valeurs d'écart-type pour U > U_crit
+% sigma_theta(68:length(U)) = 0;
 figure;
 plot(U,sigma_z,'-o',U,sigma_theta*B/2,'-o','LineWidth',1.5);
 xlabel('Vitesse moyenne horizontale U [m/s]');

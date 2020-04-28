@@ -136,6 +136,8 @@ A_0 = [zeros(2,2),eye(2);-K,-(C+C_conj)];
 
 M_final = [M_0,zeros(4,6);-Mat_A,eye(6)];
 A_final = [A_0,S_matrice;zeros(6,4),Mat_B];
+VALEURS_PROPRES(:,j) = eig(M_final\A_final); % Pour la vérification que les parties réelles des valeurs propres soient négatives
+
 
 p = 1;
 while p <= length(time)
@@ -150,7 +152,7 @@ H_zz2(var-1) = H2(1,1,var-1);
 H_tt2(var-1) = H2(2,2,var-1);
 var = var + 1;
 end
-valeurs_propres = real(eig(A_final)); % Pour la vérification que les parties réelles des valeurs propres soient négatives
+
 
 % figure;
 % plot(omega,abs(H_zz),'LineWidth',1.5); % H_zz
