@@ -1,8 +1,8 @@
 function S = S_omega(w,U,L_w,I_w)
 %Échelle de turbulence [m]
-%L_w = 20;
+L_w = 20;
 %Intensité de turbulence [-]
-%I_w = 0.05;
+I_w = 0.05;
 
 sigma_w = U*I_w; % Ecart-type
 

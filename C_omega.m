@@ -1,18 +1,14 @@
-function C = C_omega(w,U,B,Flow)
+function C = C_omega(w,U,B)
 
-if Flow == 1 
-    a0 = 1;
-    a1 = 0;
-    a2 = 0;
-    b1 = 0;
-    b2 = 0;
-elseif Flow == 0
-    a0 = 1;
-    a1 = -0.165;
-    a2 = -0.335;
-    b1 = 0.0455;
-    b2 = 0.3;
-end
+a0 = 1;
+% a1 = 0;
+% a2 = 0;
+% b1 = 0;
+% b2 = 0;
+a1 = -0.165;
+a2 = -0.335;
+b1 = 0.0455;
+b2 = 0.3;
 
 w_1 = 2*U*b1/B;
 w_2 = 2*U*b2/B;

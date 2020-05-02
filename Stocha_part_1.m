@@ -1,29 +1,29 @@
 %% Partie 1 => Analyse fréquentielle du problème
 
-function [omega_1,H_zz,H_tt,S_zz,S_tt,sigma_zz,sigma_tt,sigma_w] = Stocha_part_1(omega_1,U,Valeurs_utilisateur,Position,Flow,isComparison2)
+function [omega_1,H_zz,H_tt,S_zz,S_tt] = Stocha_part_1(isComparison,U,Valeurs_utilisateur,Position)
 
-% if isComparison2 == 0
-%     TITRES = {'Pulsation(s) étudiée(s) \omega en [rad/s]: ','Vitesse(s) moyenne(s) horizontale(s) de vent étudiée(s) U en [m/s]: ','Vitesse(s) U à afficher dans [1 100]: (Si rien à afficher, [0])'};
-%     dlgtitle = 'Inputs pour analyse FRÉQUENTIELLE';
-%     dims = [1 100];
-%     Message_initial = {'0:0.01:2','10:1:100','[10]'};
-%     opts.Interpreter = 'tex';
-%     answer = inputdlg(TITRES,dlgtitle,dims,Message_initial,opts);
-%     omega_1 = str2num(answer{1});
-%     U = str2num(answer{2});
-%     Valeurs_utilisateur = str2num(answer{3});
-%     fprintf('Une des valeurs sélectionnées est U = %d [m/s]\n',Valeurs_utilisateur);
-%     [~,Position] = intersect(U,Valeurs_utilisateur);
-%     
-% elseif isComparison2 == 1
-%      TITRES = {'Pulsation(s) étudiée(s) \omega en [rad/s]: '};
-%     dlgtitle = 'Inputs pour analyse FRÉQUENTIELLE';
-%     dims = [1 100];
-%     Message_initial = {'0:0.01:2'};
-%     opts.Interpreter = 'tex';
-%     answer = inputdlg(TITRES,dlgtitle,dims,Message_initial,opts);
-%     omega_1 = str2num(answer{1});
-% end
+if isComparison == 0
+    TITRES = {'Pulsation(s) étudiée(s) \omega en [rad/s]: ','Vitesse(s) moyenne(s) horizontale(s) de vent étudiée(s) U en [m/s]: ','Vitesse(s) U à afficher dans [1 100]: (Si rien à afficher, [0])'};
+    dlgtitle = 'Inputs pour analyse FRÉQUENTIELLE';
+    dims = [1 100];
+    Message_initial = {'0:0.01:2','10:1:100','[10]'};
+    opts.Interpreter = 'tex';
+    answer = inputdlg(TITRES,dlgtitle,dims,Message_initial,opts);
+    omega_1 = str2num(answer{1});
+    U = str2num(answer{2});
+    Valeurs_utilisateur = str2num(answer{3});
+    fprintf('Une des valeurs sélectionnées est U = %d [m/s]\n',Valeurs_utilisateur);
+    [~,Position] = intersect(U,Valeurs_utilisateur);
+    
+elseif isComparison == 1
+     TITRES = {'Pulsation(s) étudiée(s) \omega en [rad/s]: '};
+    dlgtitle = 'Inputs pour analyse FRÉQUENTIELLE';
+    dims = [1 100];
+    Message_initial = {'0:0.01:2'};
+    opts.Interpreter = 'tex';
+    answer = inputdlg(TITRES,dlgtitle,dims,Message_initial,opts);
+    omega_1 = str2num(answer{1});
+end
 
 if omega_1(1) < 1e-03
     omega_1(1) = 1e-03;
@@ -79,7 +79,7 @@ while j <= length(U)
     
     i = 1;
     while i <= length(omega_1)
-        [C_w(j,i),H(:,:,i),H_zz(j,i),H_tt(j,i)] = FRF(omega_1(i),U(j),B,rho,M,K,C,Flow);
+        [C_w(j,i),H(:,:,i),H_zz(j,i),H_tt(j,i)] = FRF(omega_1(i),U(j),B,rho,M,K,C);
         
         [S_zz(j,i),S_tt(j,i),S_w(j,i)] = PSD_omega_1(omega_1(i),U(j),B,rho,H(:,:,i),L_w,I_w);
         
@@ -92,45 +92,45 @@ while j <= length(U)
     j = j + 1;
 end
 
-if isComparison2 == 0 
-    loop = 1;
-    while loop <= length(Valeurs_utilisateur)
+if isComparison == 0 
+    var = 1;
+    while var <= length(Valeurs_utilisateur)
         % Vérification Theodorsen:
         figure;
         hold on
-        plot(omega_1,real(C_w(Position(loop),:)),'LineWidth',1.5);
-        plot(omega_1,imag(C_w(Position(loop),:)),'LineWidth',1.5);
+        plot(omega_1,real(C_w(Position(var),:)),'LineWidth',1.5);
+        plot(omega_1,imag(C_w(Position(var),:)),'LineWidth',1.5);
         hold off
-        title(['Fonction circulatoire de Theodorsen pour U = ',num2str(Valeurs_utilisateur(loop)),' [mm/s]']);
+        title('Fonction circulatoire de Theodorsen')
         xlabel('Pulsation \omega [rad/s]')
         legend('Partie réelle F(\omega)','Partie imaginaire G(\omega)');
         grid
         figure;
-        plot(omega_1,abs(H_zz(Position(loop),:)),'LineWidth',1.5); % Graphe H_zz
-        title(['Fonction de réponse fréquentielle H_{zz}(\omega) pour U = ',num2str(Valeurs_utilisateur(loop)),' [mm/s]']);
+        plot(omega_1,abs(H_zz(Position(var),:)),'LineWidth',1.5); % Graphe H_zz
+        title('Fonction de réponse fréquentielle H_{zz}(\omega)')
         xlabel('Pulsation \omega [rad/s]')
         ylabel('FRF')
         grid
         figure;
-        plot(omega_1,abs(H_tt(Position(loop),:)),'LineWidth',1.5); % Graphe H_\theta\theta
-        title(['Fonction de réponse fréquentielle H_{\theta\theta}(\omega) pour U = ',num2str(Valeurs_utilisateur(loop)),' [mm/s]']);
+        plot(omega_1,abs(H_tt(Position(var),:)),'LineWidth',1.5); % Graphe H_\theta\theta
+        title('Fonction de réponse fréquentielle H_{\theta\theta}(\omega)')
         xlabel('Pulsation \omega [rad/s]')
         ylabel('FRF')
         grid
         figure;
-        semilogy(omega_1,abs(S_zz(Position(loop),:)),'LineWidth',1.5); % Graphe PSD_zz
-        title(['Densité spectrale de puissance S_{zz}(\omega) pour U = ',num2str(Valeurs_utilisateur(loop)),' [mm/s]']);
+        semilogy(omega_1,abs(S_zz(Position(var),:)),'LineWidth',1.5); % Graphe PSD_zz
+        title('Densité spectrale de puissance S_{zz}(\omega)')
         xlabel('Pulsation \omega [rad/s]')
         ylabel('PSD')
         grid
         figure;
-        semilogy(omega_1,abs(S_tt(Position(loop),:)),'LineWidth',1.5); % Graphe PSD_\theta\theta
-        title(['Densité spectrale de puissance S_{\theta\theta}(\omega) pour U = ',num2str(Valeurs_utilisateur(loop)),' [mm/s]']);
+        semilogy(omega_1,abs(S_tt(Position(var),:)),'LineWidth',1.5); % Graphe PSD_\theta\theta
+        title('Densité spectrale de puissance S_{\theta\theta}(\omega)')
         xlabel('Pulsation \omega [rad/s]')
         ylabel('PSD')
         grid
 
-        loop = loop + 1;
+        var = var + 1;
     end
 end
 
